@@ -9,13 +9,12 @@ ext {
     versionName = "1.0"
 
     android_support_version = "25.3.1"
-    kotlin_version = '1.2.41'
 
     dependencies = [
             "design"      : "com.android.support:design:${android_support_version}",
             "support-v4"  : "com.android.support:support-v4:${android_support_version}",
             "appcompat-v7": "com.android.support:appcompat-v7:${android_support_version}",
             "junit"       : "junit:junit:4.12",
-            "kotlin"      : "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version",
+            "kotlin"      : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
     ]
 }

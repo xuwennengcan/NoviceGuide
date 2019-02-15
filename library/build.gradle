@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'kotlin-android'
 android {
     compileSdkVersion defaultCompileSdkVersion
 
@@ -18,6 +18,14 @@ android {
         }
     }
 
+}
+
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+        mavenCentral()
+        maven { url 'https://maven.google.com' }
+    }
 }
 
 dependencies {

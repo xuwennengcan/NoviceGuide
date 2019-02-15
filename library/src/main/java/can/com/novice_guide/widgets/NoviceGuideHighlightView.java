@@ -8,14 +8,14 @@ import android.view.View;
  * Created by CAN on 19-2-14.
  * 高亮区域view
  */
-class HighlightView {
+class NoviceGuideHighlightView {
 
     //高亮的view
     private View mView;
 
     private RectF rectF;
 
-    HighlightView(View mView) {
+    NoviceGuideHighlightView(View mView) {
         this.mView = mView;
     }
 
