@@ -1,13 +1,18 @@
 package can.com.novice_guide.widgets
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.graphics.*
-import android.util.Log
+import android.provider.CalendarContract
+import android.text.TextPaint
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import can.com.novice_guide.bean.NoviceGuideInfoBean
 import can.com.novice_guide.enums.NoviceGuidePictureLocationType
 import can.com.novice_guide.enums.NoviceGuideViewShapeType
+import can.com.novice_guide.uitls.NoviceGuideManager
 import java.util.*
 
 /**
@@ -19,28 +24,34 @@ class NoviceGuideFloatingLayerView : FrameLayout {
 
     private val mBgColor = -0x4d000000 //背景色
     private val mInnerPaintColor = -0x7f000001 //内圈画笔颜色
-    private val mOuterPaintColor = 0x4dffffff //外圈画笔颜色
-    private val mTextPaintColor = 0xffffff //文字画笔颜色
-    private var mInnerPaint = Paint() //内圈画笔
-    private var mOuterPaint = Paint() //外圈画笔
-    private var mTextPaint = Paint() //文字画笔
+    private val mOuterPaintColor = -0x4c000001 //外圈画笔颜色
+    private val mTextPaintColor = -0x00000001//文字画笔颜色
+    private val mInnerPaint = Paint() //内圈画笔
+    private val mOuterPaint = Paint() //外圈画笔
+    private val mTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG) //文字画笔
 
-    private val mText = "跳过" //文字
+    private var mActivity: Activity? = null
+    private var mRegionMap = WeakHashMap<View, Region>() //点击区域集合
+    private var mMap: WeakHashMap<View?, NoviceGuideInfoBean>? = null //数据
+
+    private var mText = "跳过" //文字
 
     private val mInnerOuterPadding = 10//外圈与内圈的距离
-    private val mHighLightRectPadding = 10//间距
-
-    private var mMap: HashMap<View?, NoviceGuideInfoBean>? = null //数据
+    private val mHighLightRectPadding = 10//高亮view与原始view的间距
+    private val mViewBitmapPadding = 20 //高亮view和图片间距
 
     constructor(context: Context) : super(context)
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        Log.i("tag", "aaaaa")
+        mActivity = null
+        mMap?.clear()
+        mRegionMap.clear()
     }
 
-    constructor(context: Context, map: HashMap<View?, NoviceGuideInfoBean>) : super(context) {
+    constructor(context: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>) : super(context) {
         this.mMap = map
+        this.mActivity = context
         init()
     }
 
@@ -53,13 +64,10 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     }
 
     //初始化文字画笔
-    private fun initTextPaint(paint: Paint) {
+    private fun initTextPaint(paint: TextPaint) {
         paint.color = mTextPaintColor
+        paint.textSize = 36.0f
         paint.isAntiAlias = true
-        paint.style = Paint.Style.FILL
-        paint.textSize = 24.0f
-        paint.strokeWidth = 3f
-
     }
 
     //初始化内圈画笔
@@ -81,84 +89,111 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     private fun initOuterPaint(paint: Paint) {
         paint.color = mOuterPaintColor
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 4f
+        paint.strokeWidth = 5f
         paint.isAntiAlias = true
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
         //绘制虚线
-        val dashPathEffect = DashPathEffect(floatArrayOf(12f, 4f), 1f)
+        val dashPathEffect = DashPathEffect(floatArrayOf(20f, 6f), 1f)
         paint.pathEffect = dashPathEffect
     }
 
-    override fun onDraw(canvas: Canvas) {
+    override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        canvas.drawText(mText, left.toFloat(), top.toFloat(), mTextPaint)
+        drawText(canvas,mText)
 
         val keys: MutableSet<View?>? = mMap?.keys
 
         if (keys != null) {
             for (view in keys) {
                 val bean = mMap?.get(view)
-                drawHighLightView(canvas, view, bean)
-
+                drawView(canvas, view, bean)
             }
         }
 
     }
 
-    //绘制高亮view
-    private fun drawHighLightView(canvas: Canvas?, view: View?, bean: NoviceGuideInfoBean?) {
+    //绘制文本
+    private fun drawText(canvas:Canvas?,text : String?){
+        if(text!=null&&canvas != null){
+            canvas.drawText(mText,100f, 100f, mTextPaint)
+        }
+    }
+
+    //绘制View相关
+    private fun drawView(canvas: Canvas?, view: View?, bean: NoviceGuideInfoBean?) {
         if (canvas == null || view == null || bean == null)
             return
-        val highlightView = NoviceGuideHighlightView(view) //高亮view
-        val innerRectF = highlightView.getRectF(mHighLightRectPadding) //高亮view的位置信息(内圈)
+
+        //绘制高亮view
+        val highlightView = NoviceGuideHighlightView(view, mHighLightRectPadding) //高亮view
+        val innerRectF = highlightView.getRectF() //高亮view的位置信息(内圈)
         val outerRectF = RectF(innerRectF.left - mInnerOuterPadding, innerRectF.top - mInnerOuterPadding,
                 innerRectF.right + mInnerOuterPadding, innerRectF.bottom + mInnerOuterPadding)//高亮view的位置信息(外圈)
         if (bean.viewShapeType == NoviceGuideViewShapeType.CIRCLE) {//绘制圆
             canvas.drawCircle((innerRectF.right - innerRectF.left) / 2 + innerRectF.left,
                     (innerRectF.bottom - innerRectF.top) / 2 + innerRectF.top,
-                    Math.max(innerRectF.width() / 2, innerRectF.height() / 2),
-                    mInnerPaint)
+                    Math.max(innerRectF.width() / 2, innerRectF.height() / 2), mInnerPaint)
             canvas.drawCircle((outerRectF.right - outerRectF.left) / 2 + outerRectF.left,
                     (outerRectF.bottom - outerRectF.top) / 2 + outerRectF.top,
-                    Math.max(outerRectF.width() / 2, outerRectF.height() / 2),
-                    mOuterPaint)
+                    Math.max(outerRectF.width() / 2, outerRectF.height() / 2), mOuterPaint)
         } else if (bean.viewShapeType == NoviceGuideViewShapeType.ROUND) {//绘制椭圆
             canvas.drawRoundRect(innerRectF, highlightView.radius, highlightView.radius, mInnerPaint)
             canvas.drawRoundRect(outerRectF, highlightView.radius, highlightView.radius, mOuterPaint)
         }
 
-        val bitmap = BitmapFactory.decodeResource(resources, bean.bitmapResource)
+        //绘制bitmap
+        val bitmap : Bitmap? = BitmapFactory.decodeResource(resources, bean.bitmapResource)
         if (bitmap != null && !bitmap.isRecycled) {
-
-            when(bean.pictureLocationType){
-                NoviceGuidePictureLocationType.LEFT->{
-                    canvas.drawBitmap(bitmap, width-outerRectF.left, outerRectF.top, Paint())
+            when (bean.pictureLocationType) {
+                NoviceGuidePictureLocationType.LEFT -> {
+                    canvas.drawBitmap(bitmap, outerRectF.left - bitmap.width - mViewBitmapPadding,
+                            (outerRectF.top + outerRectF.bottom - bitmap.height) / 2, Paint())
                 }
-                NoviceGuidePictureLocationType.RIGHT->{
-                    canvas.drawBitmap(bitmap, outerRectF.right, outerRectF.top, Paint())
+                NoviceGuidePictureLocationType.RIGHT -> {
+                    canvas.drawBitmap(bitmap, outerRectF.right + mViewBitmapPadding,
+                            (outerRectF.top + outerRectF.bottom - bitmap.height) / 2, Paint())
                 }
-                NoviceGuidePictureLocationType.TOP->{
-                    canvas.drawBitmap(bitmap, ((width-bitmap.width)/2).toFloat(), outerRectF.top - bitmap.height, Paint())
+                NoviceGuidePictureLocationType.TOP -> {
+                    canvas.drawBitmap(bitmap, ((width - bitmap.width) / 2).toFloat(),
+                            outerRectF.top - bitmap.height - mViewBitmapPadding, Paint())
                 }
-                NoviceGuidePictureLocationType.BOTTOM->{
-                    canvas.drawBitmap(bitmap, ((width-bitmap.width)/2).toFloat(), outerRectF.bottom, Paint())
+                NoviceGuidePictureLocationType.BOTTOM -> {
+                    canvas.drawBitmap(bitmap, ((width - bitmap.width) / 2).toFloat(),
+                            outerRectF.bottom + mViewBitmapPadding, Paint())
                 }
             }
-
             bitmap.recycle()
         }
 
+        //点击区域收集
+        mRegionMap.put(view, Region(highlightView.getRect()))
     }
 
-    private fun drawBitmap(canvas: Canvas?, view: View?, bean: NoviceGuideInfoBean?) {
-        if (canvas == null || bean == null)
-            return
-
-
-
-
+    //点击事件的处理
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                val x = event.x.toInt()
+                val y = event.y.toInt()
+                if (mRegionMap.size > 0) {
+                    val keys: MutableSet<View?>? = mRegionMap.keys
+                    if (keys != null) {
+                        for (view in keys) {
+                            if (view != null) {
+                                val region = mRegionMap[view]
+                                if (region != null && region.contains(x, y)) {
+                                    if (mActivity != null)
+                                        NoviceGuideManager.get().removeFloatingViewIfExit(mActivity!!)
+                                    view.performClick()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true
     }
-
 
 }

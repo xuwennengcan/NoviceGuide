@@ -3,8 +3,8 @@ package can.com.novice_guide.uitls
 import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import can.com.novice_guide.bean.NoviceGuideInfoBean
-import can.com.novice_guide.enums.NoviceGuidePictureLocationType
 import can.com.novice_guide.widgets.NoviceGuideFloatingLayerView
 import java.util.*
 
@@ -14,7 +14,7 @@ import java.util.*
  */
 class NoviceGuideManager private constructor() {
 
-    private val frameLayoutMaps = WeakHashMap<Activity, NoviceGuideFloatingLayerView>()
+    private val frameLayoutMaps = WeakHashMap<Activity, View>()
 
     companion object {
         private var instance: NoviceGuideManager? = null
@@ -31,7 +31,7 @@ class NoviceGuideManager private constructor() {
     }
 
     //添加浮层
-    fun addNoviceGuide(activity: Activity, map: HashMap<View?, NoviceGuideInfoBean>) {
+    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>) {
 
         removeFloatingViewIfExit(activity)
 
@@ -51,7 +51,8 @@ class NoviceGuideManager private constructor() {
 
         val viewGroup = activity.window.decorView as ViewGroup
         val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        val frameLayout = NoviceGuideFloatingLayerView(activity, map)
+//        val frameLayout = LinearLayout(activity)
+        val frameLayout = NoviceGuideFloatingLayerView(activity,map)
         frameLayout.layoutParams = layoutParams
         viewGroup.addView(frameLayout)
         frameLayoutMaps.put(activity, frameLayout)
@@ -59,9 +60,9 @@ class NoviceGuideManager private constructor() {
 
     //移除浮层
     fun removeFloatingViewIfExit(activity: Activity) {
-        if(frameLayoutMaps.containsKey(activity)){
+        if(!activity.isDestroyed&&frameLayoutMaps.containsKey(activity)){
             val viewGroup = activity.window.decorView as ViewGroup
-            val frameLayout: NoviceGuideFloatingLayerView? = frameLayoutMaps[activity]
+            val frameLayout: View? = frameLayoutMaps[activity]
             if (frameLayout != null) {
                 viewGroup.removeView(frameLayout)
                 frameLayoutMaps.remove(activity)
