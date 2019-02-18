@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.*
-import android.provider.CalendarContract
 import android.text.TextPaint
 import android.view.MotionEvent
 import android.view.View
@@ -12,7 +11,10 @@ import android.widget.FrameLayout
 import can.com.novice_guide.bean.NoviceGuideInfoBean
 import can.com.novice_guide.enums.NoviceGuidePictureLocationType
 import can.com.novice_guide.enums.NoviceGuideViewShapeType
-import can.com.novice_guide.uitls.NoviceGuideManager
+import can.com.novice_guide.manager.NoviceGuideManager
+import can.com.novice_guide.uitls.dp2px
+import can.com.novice_guide.uitls.getRect
+import can.com.novice_guide.uitls.rectF2Rect
 import java.util.*
 
 /**
@@ -33,6 +35,9 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     private var mActivity: Activity? = null
     private var mRegionMap = WeakHashMap<View, Region>() //点击区域集合
     private var mMap: WeakHashMap<View?, NoviceGuideInfoBean>? = null //数据
+    private var mTextRegion: Region? = null //text的点击区域
+
+    private var mClickListener: ((View) -> Unit)? = null //重写的点击事件
 
     private var mText = "跳过" //文字
 
@@ -44,14 +49,14 @@ class NoviceGuideFloatingLayerView : FrameLayout {
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        mActivity = null
         mMap?.clear()
         mRegionMap.clear()
     }
 
-    constructor(context: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>) : super(context) {
+    constructor(context: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View) -> Unit)?) : super(context) {
         this.mMap = map
         this.mActivity = context
+        this.mClickListener = onClickListener
         init()
     }
 
@@ -66,7 +71,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     //初始化文字画笔
     private fun initTextPaint(paint: TextPaint) {
         paint.color = mTextPaintColor
-        paint.textSize = 36.0f
+        paint.textSize = dp2px(context, 12).toFloat()
         paint.isAntiAlias = true
     }
 
@@ -74,7 +79,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     private fun initInnerPaint(paint: Paint) {
         paint.color = mInnerPaintColor
         paint.isAntiAlias = true
-        //图像模式为清除图像模式
+        //图像模式为清除图像模式,白色
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
         //设置画笔遮罩滤镜,可以传入BlurMaskFilter或EmbossMaskFilter，前者为模糊遮罩滤镜而后者为浮雕遮罩滤镜
         //这个方法已经被标注为过时的方法了，如果你的应用启用了硬件加速，你是看不到任何阴影效果的
@@ -99,7 +104,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        drawText(canvas,mText)
+        drawText(canvas, mText)
 
         val keys: MutableSet<View?>? = mMap?.keys
 
@@ -113,9 +118,18 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     }
 
     //绘制文本
-    private fun drawText(canvas:Canvas?,text : String?){
-        if(text!=null&&canvas != null){
-            canvas.drawText(mText,100f, 100f, mTextPaint)
+    private fun drawText(canvas: Canvas?, text: String?) {
+        if (text != null && canvas != null) {
+            val rect = Rect()
+            mTextPaint.getTextBounds(mText, 0, mText.length, rect)
+            val textLocationX = (width - rect.width() - dp2px(context, 15))
+            val textLocationY = rect.height() + dp2px(context, 30)
+            canvas.drawText(mText, textLocationX.toFloat(), textLocationY.toFloat(), mTextPaint)
+            mTextRegion = Region(getRect(textLocationX,
+                    textLocationY,
+                    textLocationX + rect.width(),
+                    textLocationY + rect.height(),
+                    dp2px(context, 10)))
         }
     }
 
@@ -142,7 +156,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
         }
 
         //绘制bitmap
-        val bitmap : Bitmap? = BitmapFactory.decodeResource(resources, bean.bitmapResource)
+        val bitmap: Bitmap? = BitmapFactory.decodeResource(resources, bean.bitmapResource)
         if (bitmap != null && !bitmap.isRecycled) {
             when (bean.pictureLocationType) {
                 NoviceGuidePictureLocationType.LEFT -> {
@@ -166,7 +180,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
         }
 
         //点击区域收集
-        mRegionMap.put(view, Region(highlightView.getRect()))
+        mRegionMap.put(view, Region(rectF2Rect(outerRectF)))
     }
 
     //点击事件的处理
@@ -176,24 +190,76 @@ class NoviceGuideFloatingLayerView : FrameLayout {
             MotionEvent.ACTION_DOWN -> {
                 val x = event.x.toInt()
                 val y = event.y.toInt()
-                if (mRegionMap.size > 0) {
-                    val keys: MutableSet<View?>? = mRegionMap.keys
-                    if (keys != null) {
-                        for (view in keys) {
-                            if (view != null) {
-                                val region = mRegionMap[view]
-                                if (region != null && region.contains(x, y)) {
-                                    if (mActivity != null)
-                                        NoviceGuideManager.get().removeFloatingViewIfExit(mActivity!!)
-                                    view.performClick()
-                                }
+                clickRegion(x, y)
+            }
+        }
+        return true
+    }
+
+    //处理点击的区域
+    private fun clickRegion(x: Int, y: Int) {
+        if (!mRegionMap.isEmpty()) {
+            val keys: MutableSet<View?>? = mRegionMap.keys
+            if (keys != null && !keys.isEmpty()) {
+                for (view in keys) {
+                    if (view != null) {
+                        val region = mRegionMap[view]
+                        val infoBean = mMap?.get(view)
+                        when (infoBean?.viewShapeType) {
+                            NoviceGuideViewShapeType.CIRCLE -> { //点击圆
+                                clickCircleRegion(view, region, x, y)
+                            }
+                            NoviceGuideViewShapeType.ROUND -> { //点击矩形
+                                clickRoundRegion(view, region, x, y)
                             }
                         }
                     }
                 }
             }
+        } else
+            clickSkip(x, y)
+    }
+
+    //处理矩形的区域
+    private fun clickRoundRegion(view: View?, region: Region?, x: Int, y: Int) {
+        if (region != null && region.contains(x, y)) {
+            if (mClickListener != null && view != null)
+                mClickListener!!.invoke(view)
+            else {
+                NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
+                view?.performClick()
+            }
+        } else
+            clickSkip(x, y)
+    }
+
+    //处理圆的区域
+    private fun clickCircleRegion(view: View?, region: Region?, x: Int, y: Int) {
+        if (region != null) {
+            val rect = region.bounds
+            val diameter = Math.max(Math.abs(rect.right - rect.left), Math.abs(rect.bottom - rect.top)) //圆的直径
+            val circleX = rect.left + Math.abs(rect.right - rect.left) / 2 //圆心x轴坐标
+            val circleY = rect.top + Math.abs(rect.bottom - rect.top) / 2 //圆心y轴坐标
+            val distanceX = Math.abs(x - circleX) //点击位置x坐标与圆心的距离
+            val distanceY = Math.abs(y - circleY) //点击位置y坐标与圆心的距离
+            val distance = Math.sqrt(Math.pow(distanceX.toDouble(), 2.0) + Math.pow(distanceY.toDouble(), 2.0)) //点击位置与圆心距离
+            if (distance <= diameter / 2) { //点击位置在圆内
+                if (mClickListener != null && view != null)
+                    mClickListener!!.invoke(view)
+                else {
+                    NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
+                    view?.performClick()
+                }
+            } else
+                clickSkip(x, y)
         }
-        return true
+    }
+
+    //处理跳过
+    private fun clickSkip(x: Int, y: Int) {
+        if (mTextRegion != null && mTextRegion!!.contains(x, y)) { //点击跳过
+            NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
+        }
     }
 
 }

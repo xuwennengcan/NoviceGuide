@@ -32,7 +32,7 @@ internal class NoviceGuideHighlightView(//高亮的view
         return mRectF
     }
 
-    fun getRect(): Rect {
+    private fun getRect(): Rect {
         if (mView == null) {
             throw IllegalArgumentException("view can not be null .")
         }

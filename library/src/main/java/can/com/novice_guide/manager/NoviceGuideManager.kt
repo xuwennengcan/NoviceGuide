@@ -1,9 +1,8 @@
-package can.com.novice_guide.uitls
+package can.com.novice_guide.manager
 
 import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import can.com.novice_guide.bean.NoviceGuideInfoBean
 import can.com.novice_guide.widgets.NoviceGuideFloatingLayerView
 import java.util.*
@@ -31,7 +30,7 @@ class NoviceGuideManager private constructor() {
     }
 
     //添加浮层
-    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>) {
+    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean> , onClickListener : ((View)->Unit)? = null) {
 
         removeFloatingViewIfExit(activity)
 
@@ -51,23 +50,24 @@ class NoviceGuideManager private constructor() {
 
         val viewGroup = activity.window.decorView as ViewGroup
         val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-//        val frameLayout = LinearLayout(activity)
-        val frameLayout = NoviceGuideFloatingLayerView(activity,map)
+        val frameLayout = NoviceGuideFloatingLayerView(activity,map,onClickListener)
         frameLayout.layoutParams = layoutParams
         viewGroup.addView(frameLayout)
         frameLayoutMaps.put(activity, frameLayout)
     }
 
     //移除浮层
-    fun removeFloatingViewIfExit(activity: Activity) {
-        if(!activity.isDestroyed&&frameLayoutMaps.containsKey(activity)){
+    fun removeFloatingViewIfExit(activity: Activity?) : Boolean {
+        if(activity!=null&&!activity.isDestroyed&&frameLayoutMaps.containsKey(activity)){
             val viewGroup = activity.window.decorView as ViewGroup
             val frameLayout: View? = frameLayoutMaps[activity]
             if (frameLayout != null) {
                 viewGroup.removeView(frameLayout)
                 frameLayoutMaps.remove(activity)
+                return true
             }
         }
+        return false
     }
 
 }
