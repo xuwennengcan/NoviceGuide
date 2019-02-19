@@ -2,7 +2,7 @@ ext {
     defaultCompileSdkVersion = 27
 
     applicationId = "can.com.noviceguide"
-    defaultMinSdkVersion = 21
+    defaultMinSdkVersion = 16
     defaultTargetSdkVersion = 27
 
     versionCode = 1
