@@ -16,7 +16,7 @@ internal class NoviceGuideHighlightView(//高亮的view
             if (mView == null) {
                 throw IllegalArgumentException("the highlight view is null!")
             }
-            return 50f
+            return 22f
         }
 
     fun getRectF(): RectF {
