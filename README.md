@@ -1,7 +1,7 @@
 # NoviceGuide
 自定义新手引导
 ### 引入
-    implementation 'com.github.xuwennengcan:NoviceGuide:1.0.0'
+    implementation 'com.github.xuwennengcan:NoviceGuide:1.0.1'
 ### 
 ### 使用
     val map = WeakHashMap<View?, NoviceGuideInfoBean>()
