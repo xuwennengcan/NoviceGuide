@@ -224,7 +224,7 @@ class NoviceGuideFloatingLayerView : View {
     private fun clickRoundRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) {
         if (region != null && region.contains(x, y)) {
             if (mClickListener != null && view != null)
-                mClickListener!!.invoke(view,infoBean)
+                mClickListener!!.invoke(view,infoBean )
             else {
                 NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
                 view?.performClick()
