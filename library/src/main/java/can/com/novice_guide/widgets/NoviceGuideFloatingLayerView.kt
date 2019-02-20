@@ -22,7 +22,7 @@ import java.util.*
  * 新手引导-浮层View
  */
 
-class NoviceGuideFloatingLayerView : FrameLayout {
+class NoviceGuideFloatingLayerView : View {
 
     private val mBgColor = -0x4d000000 //背景色
     private val mInnerPaintColor = -0x7f000001 //内圈画笔颜色
@@ -37,7 +37,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     private var mMap: WeakHashMap<View?, NoviceGuideInfoBean>? = null //数据
     private var mTextRegion: Region? = null //text的点击区域
 
-    private var mClickListener: ((View) -> Unit)? = null //重写的点击事件
+    private var mClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null //重写的点击事件
 
     private var mText = "跳过" //文字
 
@@ -53,7 +53,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
         mRegionMap.clear()
     }
 
-    constructor(context: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View) -> Unit)?) : super(context) {
+    constructor(context: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)?) : super(context) {
         this.mMap = map
         this.mActivity = context
         this.mClickListener = onClickListener
@@ -207,10 +207,10 @@ class NoviceGuideFloatingLayerView : FrameLayout {
                         val infoBean = mMap?.get(view)
                         when (infoBean?.viewShapeType) {
                             NoviceGuideViewShapeType.CIRCLE -> { //点击圆
-                                clickCircleRegion(view, region, x, y)
+                                clickCircleRegion(view, infoBean, region, x, y)
                             }
                             NoviceGuideViewShapeType.ROUND -> { //点击矩形
-                                clickRoundRegion(view, region, x, y)
+                                clickRoundRegion(view, infoBean, region, x, y)
                             }
                         }
                     }
@@ -221,10 +221,10 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     }
 
     //处理矩形的区域
-    private fun clickRoundRegion(view: View?, region: Region?, x: Int, y: Int) {
+    private fun clickRoundRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) {
         if (region != null && region.contains(x, y)) {
             if (mClickListener != null && view != null)
-                mClickListener!!.invoke(view)
+                mClickListener!!.invoke(view,infoBean)
             else {
                 NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
                 view?.performClick()
@@ -234,7 +234,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
     }
 
     //处理圆的区域
-    private fun clickCircleRegion(view: View?, region: Region?, x: Int, y: Int) {
+    private fun clickCircleRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) {
         if (region != null) {
             val rect = region.bounds
             val diameter = Math.max(Math.abs(rect.right - rect.left), Math.abs(rect.bottom - rect.top)) //圆的直径
@@ -245,7 +245,7 @@ class NoviceGuideFloatingLayerView : FrameLayout {
             val distance = Math.sqrt(Math.pow(distanceX.toDouble(), 2.0) + Math.pow(distanceY.toDouble(), 2.0)) //点击位置与圆心距离
             if (distance <= diameter / 2) { //点击位置在圆内
                 if (mClickListener != null && view != null)
-                    mClickListener!!.invoke(view)
+                    mClickListener!!.invoke(view, infoBean)
                 else {
                     NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
                     view?.performClick()
