@@ -21,10 +21,10 @@ class NoviceGuideActivity : AppCompatActivity() {
         val tv4 = findViewById(R.id.tv4)
         val tv5 = findViewById(R.id.tv5)
         val map = WeakHashMap<View?, NoviceGuideInfoBean>()
-        val bean1 = NoviceGuideInfoBean(R.drawable.click_look, NoviceGuidePictureLocationType.RIGHT, NoviceGuideViewShapeType.CIRCLE)
-        val bean2 = NoviceGuideInfoBean(R.drawable.enter_live, NoviceGuidePictureLocationType.BOTTOM, NoviceGuideViewShapeType.ROUND)
-        val bean3 = NoviceGuideInfoBean(R.drawable.enter_live_list, NoviceGuidePictureLocationType.TOP, NoviceGuideViewShapeType.ROUND)
-        val bean4 = NoviceGuideInfoBean(R.drawable.click_look,NoviceGuidePictureLocationType.LEFT,NoviceGuideViewShapeType.CIRCLE)
+        val bean1 = NoviceGuideInfoBean(R.drawable.ic_novice_guide_click_look_program, NoviceGuidePictureLocationType.RIGHT, NoviceGuideViewShapeType.CIRCLE)
+        val bean2 = NoviceGuideInfoBean(R.drawable.ic_novice_guide_click_enter_live_room, NoviceGuidePictureLocationType.BOTTOM, NoviceGuideViewShapeType.ROUND)
+        val bean3 = NoviceGuideInfoBean(R.drawable.ic_novice_guide_click_enter_live_list, NoviceGuidePictureLocationType.TOP, NoviceGuideViewShapeType.ROUND)
+        val bean4 = NoviceGuideInfoBean(R.drawable.ic_novice_guide_click_look_program,NoviceGuidePictureLocationType.LEFT,NoviceGuideViewShapeType.CIRCLE)
         var isShow = false
         tv.setOnClickListener {
             isShow = !isShow
