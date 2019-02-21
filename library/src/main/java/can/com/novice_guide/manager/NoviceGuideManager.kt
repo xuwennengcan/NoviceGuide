@@ -38,7 +38,7 @@ class NoviceGuideManager private constructor() {
             return
         } else {
             val keys: MutableSet<View?>? = map.keys
-            if (keys != null) {
+            if (keys != null && !keys.isEmpty()) {
                 for (i in keys) {
                     if (i == null || i.visibility == View.GONE) {
                         map.remove(i)
