@@ -7,6 +7,7 @@ import can.com.novice_guide.bean.NoviceGuideInfoBean
 import can.com.novice_guide.widgets.NoviceGuideFloatingLayerView
 import java.util.*
 
+
 /**
  * Created by CAN on 19-2-14.
  * 新手引导管理类
@@ -39,9 +40,11 @@ class NoviceGuideManager private constructor() {
         } else {
             val keys: MutableSet<View?>? = map.keys
             if (keys != null && !keys.isEmpty()) {
-                for (i in keys) {
-                    if (i == null || i.visibility == View.GONE) {
-                        map.remove(i)
+                val iterator = map.keys.iterator()
+                while (iterator.hasNext()){
+                    val key = iterator.next()
+                    if(key ==null || key.visibility == View.GONE){
+                        iterator.remove()
                     }
                 }
             }
@@ -65,7 +68,7 @@ class NoviceGuideManager private constructor() {
             val frameLayout: View? = frameLayoutMaps[activity]
             if (frameLayout != null) {
                 viewGroup.removeView(frameLayout)
-                frameLayoutMaps.remove(activity)
+                frameLayoutMaps.clear()
                 return true
             }
         }
