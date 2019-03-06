@@ -201,6 +201,25 @@ class NoviceGuideFloatingLayerView : View {
         if (!mRegionMap.isEmpty()) {
             val keys: MutableSet<View?>? = mRegionMap.keys
             if (keys != null && !keys.isEmpty()) {
+                val iterator = mRegionMap.keys.iterator()
+                while (iterator.hasNext()){
+                    val view = iterator.next()
+                    val region = mRegionMap[view]
+                    val infoBean = mMap?.get(view)
+                    when (infoBean?.viewShapeType) {
+                        NoviceGuideViewShapeType.CIRCLE -> { //点击圆
+                            clickCircleRegion(view, infoBean, region, x, y)
+                        }
+                        NoviceGuideViewShapeType.ROUND -> { //点击矩形
+                            clickRoundRegion(view, infoBean, region, x, y)
+                        }
+                    }
+                }
+            }
+
+
+            //val keys: MutableSet<View?>? = mRegionMap.keys
+            /*if (keys != null && !keys.isEmpty()) {
                 for (view in keys) {
                     if (view != null) {
                         val region = mRegionMap[view]
@@ -215,7 +234,7 @@ class NoviceGuideFloatingLayerView : View {
                         }
                     }
                 }
-            }
+            }*/
         } else
             clickSkip(x, y)
     }
