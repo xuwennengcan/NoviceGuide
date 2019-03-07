@@ -31,20 +31,21 @@ class NoviceGuideManager private constructor() {
     }
 
     //添加浮层
-    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean> , onClickListener : ((View,NoviceGuideInfoBean)->Unit)? = null) {
+    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null) {
 
         removeFloatingViewIfExit(activity)
 
         if (map.isEmpty()) {
             return
         } else {
-            val keys: MutableSet<View?>? = map.keys
+            val cloneMap = HashMap(map)
+            val keys: MutableSet<View?>? = cloneMap.keys
             if (keys != null && !keys.isEmpty()) {
                 val iterator = map.keys.iterator()
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
                     val key = iterator.next()
-                    if(key ==null || key.visibility == View.GONE){
-                        iterator.remove()
+                    if (key == null || key.visibility == View.GONE) {
+                        map.remove(key)
                     }
                 }
             }
@@ -55,15 +56,15 @@ class NoviceGuideManager private constructor() {
 
         val viewGroup = activity.window.decorView as ViewGroup
         val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        val frameLayout = NoviceGuideFloatingLayerView(activity,map,onClickListener)
+        val frameLayout = NoviceGuideFloatingLayerView(activity, map, onClickListener)
         frameLayout.layoutParams = layoutParams
         viewGroup.addView(frameLayout)
         frameLayoutMaps.put(activity, frameLayout)
     }
 
     //移除浮层
-    fun removeFloatingViewIfExit(activity: Activity?) : Boolean {
-        if(activity!=null&&frameLayoutMaps.containsKey(activity)){
+    fun removeFloatingViewIfExit(activity: Activity?): Boolean {
+        if (activity != null && frameLayoutMaps.containsKey(activity)) {
             val viewGroup = activity.window.decorView as ViewGroup
             val frameLayout: View? = frameLayoutMaps[activity]
             if (frameLayout != null) {

@@ -215,7 +215,6 @@ class NoviceGuideFloatingLayerView : View {
                             clickRoundRegion(view, infoBean, region, x, y)
                         }
                     }
-                    iterator.remove()
                 }
             }
         } else
