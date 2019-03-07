@@ -63,7 +63,7 @@ class NoviceGuideManager private constructor() {
 
     //移除浮层
     fun removeFloatingViewIfExit(activity: Activity?) : Boolean {
-        if(activity!=null&&!activity.isDestroyed&&frameLayoutMaps.containsKey(activity)){
+        if(activity!=null&&frameLayoutMaps.containsKey(activity)){
             val viewGroup = activity.window.decorView as ViewGroup
             val frameLayout: View? = frameLayoutMaps[activity]
             if (frameLayout != null) {

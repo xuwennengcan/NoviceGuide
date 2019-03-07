@@ -180,7 +180,8 @@ class NoviceGuideFloatingLayerView : View {
         }
 
         //点击区域收集
-        mRegionMap.put(view, Region(rectF2Rect(outerRectF)))
+        if (!mRegionMap.containsKey(view))
+            mRegionMap.put(view, Region(rectF2Rect(outerRectF)))
     }
 
     //点击事件的处理
@@ -202,7 +203,7 @@ class NoviceGuideFloatingLayerView : View {
             val keys: MutableSet<View?>? = mRegionMap.keys
             if (keys != null && !keys.isEmpty()) {
                 val iterator = mRegionMap.keys.iterator()
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
                     val view = iterator.next()
                     val region = mRegionMap[view]
                     val infoBean = mMap?.get(view)
@@ -214,27 +215,9 @@ class NoviceGuideFloatingLayerView : View {
                             clickRoundRegion(view, infoBean, region, x, y)
                         }
                     }
+                    iterator.remove()
                 }
             }
-
-
-            //val keys: MutableSet<View?>? = mRegionMap.keys
-            /*if (keys != null && !keys.isEmpty()) {
-                for (view in keys) {
-                    if (view != null) {
-                        val region = mRegionMap[view]
-                        val infoBean = mMap?.get(view)
-                        when (infoBean?.viewShapeType) {
-                            NoviceGuideViewShapeType.CIRCLE -> { //点击圆
-                                clickCircleRegion(view, infoBean, region, x, y)
-                            }
-                            NoviceGuideViewShapeType.ROUND -> { //点击矩形
-                                clickRoundRegion(view, infoBean, region, x, y)
-                            }
-                        }
-                    }
-                }
-            }*/
         } else
             clickSkip(x, y)
     }
@@ -243,7 +226,7 @@ class NoviceGuideFloatingLayerView : View {
     private fun clickRoundRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) {
         if (region != null && region.contains(x, y)) {
             if (mClickListener != null && view != null)
-                mClickListener!!.invoke(view,infoBean)
+                mClickListener!!.invoke(view, infoBean)
             else {
                 NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
                 view?.performClick()
