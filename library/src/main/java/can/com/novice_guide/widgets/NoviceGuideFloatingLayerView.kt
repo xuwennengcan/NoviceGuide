@@ -52,6 +52,7 @@ class NoviceGuideFloatingLayerView : View {
         super.onDetachedFromWindow()
         mMap?.clear()
         mRegionMap.clear()
+        mCloneMap?.clear()
     }
 
     constructor(context: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)?) : super(context) {
@@ -109,12 +110,15 @@ class NoviceGuideFloatingLayerView : View {
 
         drawText(canvas, mText)
 
-        if (mMap != null) {
-            mCloneMap.putAll(mMap!!)
-            for (entries in mCloneMap.entries) {
-                val view = entries.key
-                val bean = mCloneMap[view]
-                drawView(canvas, view, bean)
+        val keys: MutableSet<View?>? = mMap?.keys
+        if(keys!=null && !keys.isEmpty()){
+            if (mMap != null) {
+                mCloneMap.putAll(mMap!!)
+                for (entries in mCloneMap.entries) {
+                    val view = entries.key
+                    val bean = mCloneMap[view]
+                    drawView(canvas, view, bean)
+                }
             }
         }
     }
