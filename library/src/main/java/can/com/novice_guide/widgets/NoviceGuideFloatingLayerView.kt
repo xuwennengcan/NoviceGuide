@@ -203,7 +203,7 @@ class NoviceGuideFloatingLayerView : View {
             val keys: MutableSet<View?>? = mRegionMap.keys
             if (keys != null && !keys.isEmpty()) {
                 val iterator = mRegionMap.keys.iterator()
-                iterator@ while (iterator.hasNext()) {
+                iterator@ while (iterator.hasNext()) { //记得退出迭代器，防止报ConcurrentModificationException
                     val view = iterator.next()
                     val region = mRegionMap[view]
                     val infoBean = mMap?.get(view)
