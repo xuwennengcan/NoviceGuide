@@ -203,16 +203,18 @@ class NoviceGuideFloatingLayerView : View {
             val keys: MutableSet<View?>? = mRegionMap.keys
             if (keys != null && !keys.isEmpty()) {
                 val iterator = mRegionMap.keys.iterator()
-                while (iterator.hasNext()) {
+                iterator@ while (iterator.hasNext()) {
                     val view = iterator.next()
                     val region = mRegionMap[view]
                     val infoBean = mMap?.get(view)
                     when (infoBean?.viewShapeType) {
                         NoviceGuideViewShapeType.CIRCLE -> { //点击圆
-                            clickCircleRegion(view, infoBean, region, x, y)
+                            if(clickCircleRegion(view, infoBean, region, x, y))
+                                break@iterator
                         }
                         NoviceGuideViewShapeType.ROUND -> { //点击矩形
-                            clickRoundRegion(view, infoBean, region, x, y)
+                            if(clickRoundRegion(view, infoBean, region, x, y))
+                                break@iterator
                         }
                     }
                 }
@@ -222,20 +224,21 @@ class NoviceGuideFloatingLayerView : View {
     }
 
     //处理矩形的区域
-    private fun clickRoundRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) {
-        if (region != null && region.contains(x, y)) {
+    private fun clickRoundRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) :Boolean{
+        return if (region != null && region.contains(x, y)) {
             if (mClickListener != null && view != null)
                 mClickListener!!.invoke(view, infoBean)
             else {
                 NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
                 view?.performClick()
             }
+            true
         } else
             clickSkip(x, y)
     }
 
     //处理圆的区域
-    private fun clickCircleRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) {
+    private fun clickCircleRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int): Boolean {
         if (region != null) {
             val rect = region.bounds
             val diameter = Math.max(Math.abs(rect.right - rect.left), Math.abs(rect.bottom - rect.top)) //圆的直径
@@ -244,23 +247,27 @@ class NoviceGuideFloatingLayerView : View {
             val distanceX = Math.abs(x - circleX) //点击位置x坐标与圆心的距离
             val distanceY = Math.abs(y - circleY) //点击位置y坐标与圆心的距离
             val distance = Math.sqrt(Math.pow(distanceX.toDouble(), 2.0) + Math.pow(distanceY.toDouble(), 2.0)) //点击位置与圆心距离
-            if (distance <= diameter / 2) { //点击位置在圆内
+            return if (distance <= diameter / 2) { //点击位置在圆内
                 if (mClickListener != null && view != null)
                     mClickListener!!.invoke(view, infoBean)
                 else {
                     NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
                     view?.performClick()
                 }
+                true
             } else
                 clickSkip(x, y)
-        }
+        } else
+            return false
     }
 
     //处理跳过
-    private fun clickSkip(x: Int, y: Int) {
+    private fun clickSkip(x: Int, y: Int) : Boolean {
         if (mTextRegion != null && mTextRegion!!.contains(x, y)) { //点击跳过
             NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
+            return true
         }
+        return false
     }
 
 }
