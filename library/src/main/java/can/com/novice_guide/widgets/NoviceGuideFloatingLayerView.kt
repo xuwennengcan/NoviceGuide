@@ -16,7 +16,6 @@ import can.com.novice_guide.uitls.dp2px
 import can.com.novice_guide.uitls.getRect
 import can.com.novice_guide.uitls.rectF2Rect
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Created by CAN on 19-2-14.
@@ -52,7 +51,6 @@ class NoviceGuideFloatingLayerView : View {
         super.onDetachedFromWindow()
         mMap?.clear()
         mRegionMap.clear()
-        mCloneMap?.clear()
     }
 
     constructor(context: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)?) : super(context) {
@@ -103,24 +101,20 @@ class NoviceGuideFloatingLayerView : View {
         paint.pathEffect = dashPathEffect
     }
 
-    private val mCloneMap = ConcurrentHashMap<View?, NoviceGuideInfoBean>()
-
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
         drawText(canvas, mText)
 
         val keys: MutableSet<View?>? = mMap?.keys
-        if(keys!=null && !keys.isEmpty()){
-            if (mMap != null) {
-                mCloneMap.putAll(mMap!!)
-                for (entries in mCloneMap.entries) {
-                    val view = entries.key
-                    val bean = mCloneMap[view]
-                    drawView(canvas, view, bean)
-                }
+
+        if (keys != null) {
+            for (view in keys) {
+                val bean = mMap?.get(view)
+                drawView(canvas, view, bean)
             }
         }
+
     }
 
     //绘制文本
@@ -208,10 +202,9 @@ class NoviceGuideFloatingLayerView : View {
         if (!mRegionMap.isEmpty()) {
             val keys: MutableSet<View?>? = mRegionMap.keys
             if (keys != null && !keys.isEmpty()) {
-                val map = ConcurrentHashMap<View, Region>()
-                map.putAll(mRegionMap)
-                for (entry in map.entries) {
-                    val view = entry.key
+                val iterator = mRegionMap.keys.iterator()
+                while (iterator.hasNext()) {
+                    val view = iterator.next()
                     val region = mRegionMap[view]
                     val infoBean = mMap?.get(view)
                     when (infoBean?.viewShapeType) {
