@@ -35,22 +35,6 @@ class NoviceGuideManager private constructor() {
 
         removeFloatingViewIfExit(activity)
 
-        if (map.isEmpty()) {
-            return
-        } else {
-            val cloneMap = HashMap(map)
-            val keys: MutableSet<View?>? = cloneMap.keys
-            if (keys != null && !keys.isEmpty()) {
-                val iterator = map.keys.iterator()
-                while (iterator.hasNext()) {
-                    val key = iterator.next()
-                    if (key == null || key.visibility == View.GONE) {
-                        map.remove(key)
-                    }
-                }
-            }
-        }
-
         if (map.isEmpty())
             return
 
