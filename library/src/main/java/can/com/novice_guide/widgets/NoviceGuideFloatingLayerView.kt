@@ -7,7 +7,6 @@ import android.graphics.*
 import android.text.TextPaint
 import android.view.MotionEvent
 import android.view.View
-import android.widget.FrameLayout
 import can.com.novice_guide.bean.NoviceGuideInfoBean
 import can.com.novice_guide.enums.NoviceGuidePictureLocationType
 import can.com.novice_guide.enums.NoviceGuideViewShapeType
@@ -266,8 +265,14 @@ class NoviceGuideFloatingLayerView : View {
         if (mTextRegion != null && mTextRegion!!.contains(x, y)) { //点击跳过
             NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
             return true
-        }
+        }else
+            clickOther()
         return false
+    }
+
+    //点击其它区域
+    private fun clickOther(){
+        NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
     }
 
 }

@@ -30,7 +30,7 @@ class NoviceGuideActivity : AppCompatActivity() {
             isShow = !isShow
             if (isShow) {
                 map.put(tv, bean1)
-                NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){
+                NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){ _,_->
                     NoviceGuideManager.get().removeFloatingViewIfExit(this@NoviceGuideActivity)
                     isShow = false
                 }
@@ -41,7 +41,7 @@ class NoviceGuideActivity : AppCompatActivity() {
             isShow = !isShow
             if (isShow) {
                 map.put(tv2, bean2)
-                NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){
+                NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){_,_->
                     NoviceGuideManager.get().removeFloatingViewIfExit(this@NoviceGuideActivity)
                     isShow = false
                 }
