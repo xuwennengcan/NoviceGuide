@@ -202,28 +202,35 @@ class NoviceGuideFloatingLayerView : View {
             val keys: MutableSet<View?>? = mRegionMap.keys
             if (keys != null && !keys.isEmpty()) {
                 val iterator = mRegionMap.keys.iterator()
+                var isClick = false
                 iterator@ while (iterator.hasNext()) { //记得退出迭代器，防止报ConcurrentModificationException
                     val view = iterator.next()
                     val region = mRegionMap[view]
                     val infoBean = mMap?.get(view)
                     when (infoBean?.viewShapeType) {
                         NoviceGuideViewShapeType.CIRCLE -> { //点击圆
-                            if(clickCircleRegion(view, infoBean, region, x, y))
+                            if (clickCircleRegion(view, infoBean, region, x, y)) {
+                                isClick = true
                                 break@iterator
+                            }
                         }
                         NoviceGuideViewShapeType.ROUND -> { //点击矩形
-                            if(clickRoundRegion(view, infoBean, region, x, y))
+                            if (clickRoundRegion(view, infoBean, region, x, y)) {
+                                isClick = true
                                 break@iterator
+                            }
                         }
                     }
                 }
+                if (!isClick)
+                    clickOther()
             }
         } else
             clickSkip(x, y)
     }
 
     //处理矩形的区域
-    private fun clickRoundRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int) :Boolean{
+    private fun clickRoundRegion(view: View?, infoBean: NoviceGuideInfoBean, region: Region?, x: Int, y: Int): Boolean {
         return if (region != null && region.contains(x, y)) {
             if (mClickListener != null && view != null)
                 mClickListener!!.invoke(view, infoBean)
@@ -261,16 +268,15 @@ class NoviceGuideFloatingLayerView : View {
     }
 
     //处理跳过
-    private fun clickSkip(x: Int, y: Int) : Boolean {
+    private fun clickSkip(x: Int, y: Int): Boolean {
         if (mTextRegion != null && mTextRegion!!.contains(x, y)) { //点击跳过
             NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
-        }else
-            clickOther()
-        return true
+        }
+        return false
     }
 
     //点击其它区域
-    private fun clickOther(){
+    private fun clickOther() {
         NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
     }
 
