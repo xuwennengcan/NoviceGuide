@@ -264,10 +264,9 @@ class NoviceGuideFloatingLayerView : View {
     private fun clickSkip(x: Int, y: Int) : Boolean {
         if (mTextRegion != null && mTextRegion!!.contains(x, y)) { //点击跳过
             NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
-            return true
         }else
             clickOther()
-        return false
+        return true
     }
 
     //点击其它区域
