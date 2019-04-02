@@ -37,6 +37,7 @@ class NoviceGuideFloatingLayerView : View {
     private var mTextRegion: Region? = null //text的点击区域
 
     private var mClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null //重写的点击事件
+    private var mOnSkipClickListener: (() -> Unit)? = null //点击跳过的事件
 
     private var mText = "跳过" //文字
 
@@ -65,6 +66,12 @@ class NoviceGuideFloatingLayerView : View {
         initInnerPaint(mInnerPaint)
         initOuterPaint(mOuterPaint)
         initTextPaint(mTextPaint)
+    }
+
+    //设置跳过的事件
+    fun setOnSkipClickListener(onSkipClickListener: () -> Unit): NoviceGuideFloatingLayerView {
+        mOnSkipClickListener = onSkipClickListener
+        return this
     }
 
     //初始化文字画笔
@@ -188,9 +195,7 @@ class NoviceGuideFloatingLayerView : View {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                val x = event.x.toInt()
-                val y = event.y.toInt()
-                clickRegion(x, y)
+                clickRegion(event.x.toInt(), event.y.toInt())
             }
         }
         return true
@@ -203,24 +208,27 @@ class NoviceGuideFloatingLayerView : View {
             if (keys != null && !keys.isEmpty()) {
                 val iterator = mRegionMap.keys.iterator()
                 var isClick = false
-                iterator@ while (iterator.hasNext()) { //记得退出迭代器，防止报ConcurrentModificationException
-                    val view = iterator.next()
-                    val region = mRegionMap[view]
-                    val infoBean = mMap?.get(view)
-                    when (infoBean?.viewShapeType) {
-                        NoviceGuideViewShapeType.CIRCLE -> { //点击圆
-                            if (clickCircleRegion(view, infoBean, region, x, y)) {
-                                isClick = true
-                                break@iterator
+                try {
+                    iterator@ while (iterator.hasNext()) { //记得退出迭代器，防止报ConcurrentModificationException
+                        val view = iterator.next()
+                        val region = mRegionMap[view]
+                        val infoBean = mMap?.get(view)
+                        when (infoBean?.viewShapeType) {
+                            NoviceGuideViewShapeType.CIRCLE -> { //点击圆
+                                if (clickCircleRegion(view, infoBean, region, x, y)) {
+                                    isClick = true
+                                    break@iterator
+                                }
                             }
-                        }
-                        NoviceGuideViewShapeType.ROUND -> { //点击矩形
-                            if (clickRoundRegion(view, infoBean, region, x, y)) {
-                                isClick = true
-                                break@iterator
+                            NoviceGuideViewShapeType.ROUND -> { //点击矩形
+                                if (clickRoundRegion(view, infoBean, region, x, y)) {
+                                    isClick = true
+                                    break@iterator
+                                }
                             }
                         }
                     }
+                } catch (exception: Exception) {
                 }
                 if (!isClick)
                     clickOther()
@@ -270,6 +278,7 @@ class NoviceGuideFloatingLayerView : View {
     //处理跳过
     private fun clickSkip(x: Int, y: Int): Boolean {
         if (mTextRegion != null && mTextRegion!!.contains(x, y)) { //点击跳过
+            mOnSkipClickListener?.invoke()
             NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
         }
         return false
@@ -277,6 +286,7 @@ class NoviceGuideFloatingLayerView : View {
 
     //点击其它区域
     private fun clickOther() {
+        mOnSkipClickListener?.invoke()
         NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
     }
 

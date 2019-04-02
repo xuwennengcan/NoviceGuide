@@ -49,12 +49,10 @@ class NoviceGuideActivity : AppCompatActivity() {
         }
 
         tv3.setOnClickListener {
-            isShow = !isShow
-            if (isShow) {
-                map.put(tv3, bean3)
-                NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)
-            }else
-                Toast.makeText(this@NoviceGuideActivity,"这是view的点击事件",Toast.LENGTH_SHORT).show()
+            map.put(tv3, bean3)
+            NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)?.setOnSkipClickListener {
+                Toast.makeText(this@NoviceGuideActivity,"点击了跳过",Toast.LENGTH_SHORT).show()
+            }
         }
 
         tv4.setOnClickListener {
@@ -62,8 +60,10 @@ class NoviceGuideActivity : AppCompatActivity() {
             if(isShow){
                 map.put(tv4,bean4)
                 NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)
-            }else
-                Toast.makeText(this@NoviceGuideActivity,"这是view的点击事件",Toast.LENGTH_SHORT).show()
+            }else{
+
+                //Toast.makeText(this@NoviceGuideActivity,"这是view的点击事件",Toast.LENGTH_SHORT).show()
+            }
         }
 
         tv5.setOnClickListener {

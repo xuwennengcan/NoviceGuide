@@ -31,12 +31,12 @@ class NoviceGuideManager private constructor() {
     }
 
     //添加浮层
-    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null) {
+    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null):NoviceGuideFloatingLayerView? {
 
         removeFloatingViewIfExit(activity)
 
         if (map.isEmpty())
-            return
+            return null
 
         val viewGroup = activity.window.decorView as ViewGroup
         val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -44,6 +44,7 @@ class NoviceGuideManager private constructor() {
         frameLayout.layoutParams = layoutParams
         viewGroup.addView(frameLayout)
         frameLayoutMaps.put(activity, frameLayout)
+        return frameLayout
     }
 
     //移除浮层
