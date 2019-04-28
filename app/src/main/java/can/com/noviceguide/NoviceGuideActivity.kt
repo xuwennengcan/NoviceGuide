@@ -61,7 +61,6 @@ class NoviceGuideActivity : AppCompatActivity() {
                 map.put(tv4,bean4)
                 NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)
             }else{
-
                 //Toast.makeText(this@NoviceGuideActivity,"这是view的点击事件",Toast.LENGTH_SHORT).show()
             }
         }
