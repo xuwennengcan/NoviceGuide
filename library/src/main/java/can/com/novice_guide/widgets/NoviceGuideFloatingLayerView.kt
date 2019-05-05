@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import can.com.novice_guide.bean.NoviceGuideInfoBean
 import can.com.novice_guide.enums.NoviceGuidePictureLocationType
+import can.com.novice_guide.enums.NoviceGuideSkipTextPosition
 import can.com.novice_guide.enums.NoviceGuideViewShapeType
 import can.com.novice_guide.manager.NoviceGuideManager
 import can.com.novice_guide.uitls.dp2px
@@ -39,7 +40,8 @@ class NoviceGuideFloatingLayerView : View {
     private var mClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null //重写的点击事件
     private var mOnSkipClickListener: (() -> Unit)? = null //点击跳过的事件
 
-    private var mText = "跳过" //文字
+    private var mSkipText = "跳过" //文字
+    private var mSkipTextPosition = NoviceGuideSkipTextPosition.RIGHT_TOP //跳过文字的位置
 
     private val mInnerOuterPadding = 10//外圈与内圈的距离
     private val mHighLightRectPadding = 10//高亮view与原始view的间距
@@ -71,6 +73,13 @@ class NoviceGuideFloatingLayerView : View {
     //设置跳过的事件
     fun setOnSkipClickListener(onSkipClickListener: () -> Unit): NoviceGuideFloatingLayerView {
         mOnSkipClickListener = onSkipClickListener
+        return this
+    }
+
+    //设置跳过文字以及位置,位置参考 NoviceGuideSkipTextPosition
+    fun setOnSkipText(skip: String, skipPosition: Int): NoviceGuideFloatingLayerView {
+        mSkipText = skip
+        mSkipTextPosition = skipPosition
         return this
     }
 
@@ -110,7 +119,7 @@ class NoviceGuideFloatingLayerView : View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        drawText(canvas, mText)
+        drawText(canvas, mSkipText)
 
         val keys: MutableSet<View?>? = mMap?.keys
 
@@ -127,10 +136,13 @@ class NoviceGuideFloatingLayerView : View {
     private fun drawText(canvas: Canvas?, text: String?) {
         if (text != null && canvas != null) {
             val rect = Rect()
-            mTextPaint.getTextBounds(mText, 0, mText.length, rect)
-            val textLocationX = (width - rect.width() - dp2px(context, 15))
-            val textLocationY = rect.height() + dp2px(context, 30)
-            canvas.drawText(mText, textLocationX.toFloat(), textLocationY.toFloat(), mTextPaint)
+            mTextPaint.getTextBounds(mSkipText, 0, mSkipText.length, rect)
+            val textLocationX = if (mSkipTextPosition == NoviceGuideSkipTextPosition.LEFT_TOP)
+                dp2px(context, 20)
+            else
+                width - rect.width() - dp2px(context, 15)
+            val textLocationY = rect.height() + dp2px(context, 40)
+            canvas.drawText(mSkipText, textLocationX.toFloat(), textLocationY.toFloat(), mTextPaint)
             mTextRegion = Region(getRect(textLocationX,
                     textLocationY,
                     textLocationX + rect.width(),
@@ -153,12 +165,14 @@ class NoviceGuideFloatingLayerView : View {
             canvas.drawCircle((innerRectF.right - innerRectF.left) / 2 + innerRectF.left,
                     (innerRectF.bottom - innerRectF.top) / 2 + innerRectF.top,
                     Math.max(innerRectF.width() / 2, innerRectF.height() / 2), mInnerPaint)
-            canvas.drawCircle((outerRectF.right - outerRectF.left) / 2 + outerRectF.left,
-                    (outerRectF.bottom - outerRectF.top) / 2 + outerRectF.top,
-                    Math.max(outerRectF.width() / 2, outerRectF.height() / 2), mOuterPaint)
+            if (bean.needDrawOuter)
+                canvas.drawCircle((outerRectF.right - outerRectF.left) / 2 + outerRectF.left,
+                        (outerRectF.bottom - outerRectF.top) / 2 + outerRectF.top,
+                        Math.max(outerRectF.width() / 2, outerRectF.height() / 2), mOuterPaint)
         } else if (bean.viewShapeType == NoviceGuideViewShapeType.ROUND) {//绘制椭圆
             canvas.drawRoundRect(innerRectF, highlightView.radius, highlightView.radius, mInnerPaint)
-            canvas.drawRoundRect(outerRectF, highlightView.radius, highlightView.radius, mOuterPaint)
+            if (bean.needDrawOuter)
+                canvas.drawRoundRect(outerRectF, highlightView.radius, highlightView.radius, mOuterPaint)
         }
 
         //绘制bitmap
@@ -187,14 +201,18 @@ class NoviceGuideFloatingLayerView : View {
 
         //点击区域收集
         if (!mRegionMap.containsKey(view))
-            mRegionMap.put(view, Region(rectF2Rect(outerRectF)))
+            if (bean.needDrawOuter)
+                mRegionMap.put(view, Region(rectF2Rect(outerRectF)))
+            else
+                mRegionMap.put(view, Region(rectF2Rect(innerRectF)))
+
     }
 
     //点击事件的处理
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
-            MotionEvent.ACTION_DOWN -> {
+            MotionEvent.ACTION_UP -> {
                 clickRegion(event.x.toInt(), event.y.toInt())
             }
         }

@@ -31,7 +31,7 @@ class NoviceGuideManager private constructor() {
     }
 
     //添加浮层
-    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null):NoviceGuideFloatingLayerView? {
+    fun addNoviceGuide(activity: Activity, map: WeakHashMap<View?, NoviceGuideInfoBean>, onClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null): NoviceGuideFloatingLayerView? {
 
         removeFloatingViewIfExit(activity)
 

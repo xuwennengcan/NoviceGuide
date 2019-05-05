@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import can.com.novice_guide.bean.NoviceGuideInfoBean
 import can.com.novice_guide.enums.NoviceGuidePictureLocationType
+import can.com.novice_guide.enums.NoviceGuideSkipTextPosition
 import can.com.novice_guide.enums.NoviceGuideViewShapeType
 import can.com.novice_guide.manager.NoviceGuideManager
 import java.util.*
@@ -20,6 +21,8 @@ class NoviceGuideActivity : AppCompatActivity() {
         val tv3 = findViewById(R.id.tv3)
         val tv4 = findViewById(R.id.tv4)
         val tv5 = findViewById(R.id.tv5)
+        val ivMore = findViewById(R.id.iv_more)
+
         val map = WeakHashMap<View?, NoviceGuideInfoBean>()
         val bean1 = NoviceGuideInfoBean(R.drawable.ic_novice_guide_click_look_program, NoviceGuidePictureLocationType.RIGHT, NoviceGuideViewShapeType.CIRCLE)
         val bean2 = NoviceGuideInfoBean(R.drawable.ic_novice_guide_click_enter_live_room, NoviceGuidePictureLocationType.BOTTOM, NoviceGuideViewShapeType.ROUND)
@@ -37,6 +40,14 @@ class NoviceGuideActivity : AppCompatActivity() {
             }
         }
 
+        val bean5 = NoviceGuideInfoBean(R.drawable.ic_guide_arrow,NoviceGuidePictureLocationType.BOTTOM,NoviceGuideViewShapeType.CIRCLE,false)
+
+        ivMore.setOnClickListener {
+            map.put(it,bean5)
+            NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity,map)
+                    ?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)
+        }
+
         tv2.setOnClickListener {
             isShow = !isShow
             if (isShow) {
@@ -52,7 +63,7 @@ class NoviceGuideActivity : AppCompatActivity() {
             map.put(tv3, bean3)
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)?.setOnSkipClickListener {
                 Toast.makeText(this@NoviceGuideActivity,"点击了跳过",Toast.LENGTH_SHORT).show()
-            }
+            }?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)
         }
 
         tv4.setOnClickListener {
