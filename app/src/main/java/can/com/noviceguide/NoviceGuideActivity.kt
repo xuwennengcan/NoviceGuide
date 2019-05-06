@@ -43,7 +43,7 @@ class NoviceGuideActivity : AppCompatActivity() {
         val bean5 = NoviceGuideInfoBean(R.drawable.ic_guide_arrow,NoviceGuidePictureLocationType.BOTTOM,NoviceGuideViewShapeType.CIRCLE,false)
 
         ivMore.setOnClickListener {
-            map.put(it,bean5)
+            map.put(null,bean5)
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity,map)
                     ?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)
         }

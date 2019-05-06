@@ -252,7 +252,7 @@ class NoviceGuideFloatingLayerView : View {
                     clickOther()
             }
         } else
-            clickSkip(x, y)
+            if (!clickSkip(x, y)) clickOther()
     }
 
     //处理矩形的区域
