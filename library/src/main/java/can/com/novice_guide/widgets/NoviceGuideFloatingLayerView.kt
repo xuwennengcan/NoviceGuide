@@ -37,8 +37,9 @@ class NoviceGuideFloatingLayerView : View {
     private var mMap: WeakHashMap<View?, NoviceGuideInfoBean>? = null //数据
     private var mTextRegion: Region? = null //text的点击区域
 
-    private var mClickListener: ((View, NoviceGuideInfoBean) -> Unit)? = null //重写的点击事件
-    private var mOnSkipClickListener: (() -> Unit)? = null //点击跳过的事件
+    private var mClickListener: ((View, NoviceGuideInfoBean) -> Unit?)? = null //重写的点击事件
+    private var mOnSkipClickListener: (() -> Unit?)? = null //点击跳过的事件
+    private var mCanTouchEmptyRegion = true //是否可以点击空白区域
 
     private var mSkipText = "跳过" //文字
     private var mSkipTextPosition = NoviceGuideSkipTextPosition.RIGHT_TOP //跳过文字的位置
@@ -71,15 +72,21 @@ class NoviceGuideFloatingLayerView : View {
     }
 
     //设置跳过的事件
-    fun setOnSkipClickListener(onSkipClickListener: () -> Unit): NoviceGuideFloatingLayerView {
+    fun setOnSkipClickListener(onSkipClickListener: () -> Unit): NoviceGuideFloatingLayerView? {
         mOnSkipClickListener = onSkipClickListener
         return this
     }
 
-    //设置跳过文字以及位置,位置参考 NoviceGuideSkipTextPosition
-    fun setOnSkipText(skip: String, skipPosition: Int): NoviceGuideFloatingLayerView {
+    //设置跳过文字以及位置(默认位置右上角，文字“跳过”),位置参考 NoviceGuideSkipTextPosition
+    fun setOnSkipText(skip: String, skipPosition: Int): NoviceGuideFloatingLayerView? {
         mSkipText = skip
         mSkipTextPosition = skipPosition
+        return this
+    }
+
+    //设置点击其它空白区域是否响应跳过事件(默认true)
+    fun setOnIsTouchEmptyRegion(isCanTouchEmptyRegion: Boolean): NoviceGuideFloatingLayerView? {
+        mCanTouchEmptyRegion = isCanTouchEmptyRegion
         return this
     }
 
@@ -205,7 +212,6 @@ class NoviceGuideFloatingLayerView : View {
                 mRegionMap.put(view, Region(rectF2Rect(outerRectF)))
             else
                 mRegionMap.put(view, Region(rectF2Rect(innerRectF)))
-
     }
 
     //点击事件的处理
@@ -304,8 +310,10 @@ class NoviceGuideFloatingLayerView : View {
 
     //点击其它区域
     private fun clickOther() {
-        mOnSkipClickListener?.invoke()
-        NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
+        if (mCanTouchEmptyRegion) {
+            mOnSkipClickListener?.invoke()
+            NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
+        }
     }
 
 }

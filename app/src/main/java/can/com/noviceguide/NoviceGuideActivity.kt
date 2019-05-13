@@ -43,7 +43,7 @@ class NoviceGuideActivity : AppCompatActivity() {
         val bean5 = NoviceGuideInfoBean(R.drawable.ic_guide_arrow,NoviceGuidePictureLocationType.BOTTOM,NoviceGuideViewShapeType.CIRCLE,false)
 
         ivMore.setOnClickListener {
-            map.put(null,bean5)
+            map.put(ivMore,bean5)
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity,map)
                     ?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)
         }
@@ -63,7 +63,7 @@ class NoviceGuideActivity : AppCompatActivity() {
             map.put(tv3, bean3)
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)?.setOnSkipClickListener {
                 Toast.makeText(this@NoviceGuideActivity,"点击了跳过",Toast.LENGTH_SHORT).show()
-            }?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)
+            }?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)?.setOnIsTouchEmptyRegion(false)
         }
 
         tv4.setOnClickListener {
