@@ -304,6 +304,7 @@ class NoviceGuideFloatingLayerView : View {
         if (mTextRegion != null && mTextRegion!!.contains(x, y)) { //点击跳过
             mOnSkipClickListener?.invoke()
             NoviceGuideManager.get().removeFloatingViewIfExit(mActivity)
+            return true
         }
         return false
     }
