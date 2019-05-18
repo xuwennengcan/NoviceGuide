@@ -1,4 +1,4 @@
-package can.com.noviceguide
+﻿package can.com.noviceguide
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -36,7 +36,7 @@ class NoviceGuideActivity : AppCompatActivity() {
                 NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){ _,_->
                     NoviceGuideManager.get().removeFloatingViewIfExit(this@NoviceGuideActivity)
                     isShow = false
-                }
+                } 
             }
         }
 
