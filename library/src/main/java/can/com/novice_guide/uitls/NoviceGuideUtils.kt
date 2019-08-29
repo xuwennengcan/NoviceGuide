@@ -18,11 +18,11 @@ fun px2dp(context: Context, px: Int): Int {
     return (px / density + 0.5).toInt()
 }
 
-fun getRect(left:Int,top:Int,right:Int,bottom:Int,padding:Int) : Rect{
-    return Rect(left-padding,top-padding,right+padding,bottom+padding)
+fun getRect(left: Int, top: Int, right: Int, bottom: Int, padding: Int): Rect {
+    return Rect(left - padding, top - padding, right + padding, bottom + padding)
 }
 
-fun rectF2Rect(rectF: RectF) : Rect{
+fun rectF2Rect(rectF: RectF): Rect {
     val rect = Rect()
     rect.left = rectF.left.toInt()
     rect.right = rectF.right.toInt()
