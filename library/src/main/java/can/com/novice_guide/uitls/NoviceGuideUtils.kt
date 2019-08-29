@@ -3,7 +3,6 @@ package can.com.novice_guide.uitls
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.RectF
-import java.security.AccessController.getContext
 
 /**
  * Created by CAN on 19-2-18.
