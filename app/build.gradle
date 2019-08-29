@@ -32,5 +32,6 @@ dependencies {
     implementation rootProject.ext.dependencies["junit"]
     implementation rootProject.ext.dependencies["kotlin"]
     implementation project(':library')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 }

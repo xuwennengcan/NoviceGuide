@@ -24,10 +24,9 @@ import java.util.*
 
 class NoviceGuideFloatingLayerView : View {
 
-    private val mBgColor = -0x4d000000 //背景色
-    private val mInnerPaintColor = -0x7f000001 //内圈画笔颜色
-    private val mOuterPaintColor = -0x4c000001 //外圈画笔颜色
-    private val mTextPaintColor = -0x00000001//文字画笔颜色
+    private val mBgColor = 0xB3000000.toInt() //背景色
+    private val mOuterPaintColor = 0xFFCDCDCD.toInt() //外圈画笔颜色
+    private val mTextPaintColor = 0xFFFFFFFF.toInt()//文字画笔颜色
     private val mInnerPaint = Paint() //内圈画笔
     private val mOuterPaint = Paint() //外圈画笔
     private val mTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG) //文字画笔
@@ -99,7 +98,6 @@ class NoviceGuideFloatingLayerView : View {
 
     //初始化内圈画笔
     private fun initInnerPaint(paint: Paint) {
-        paint.color = mInnerPaintColor
         paint.isAntiAlias = true
         //图像模式为清除图像模式,白色
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
@@ -107,7 +105,7 @@ class NoviceGuideFloatingLayerView : View {
         //这个方法已经被标注为过时的方法了，如果你的应用启用了硬件加速，你是看不到任何阴影效果的
         paint.maskFilter = BlurMaskFilter(1f, BlurMaskFilter.Blur.SOLID)
         //关闭当前view的硬件加速
-        setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        setLayerType(LAYER_TYPE_HARDWARE, null)
         //保证调用onDraw()
         setWillNotDraw(false)
     }
@@ -209,9 +207,9 @@ class NoviceGuideFloatingLayerView : View {
         //点击区域收集
         if (!mRegionMap.containsKey(view))
             if (bean.needDrawOuter)
-                mRegionMap.put(view, Region(rectF2Rect(outerRectF)))
+                mRegionMap[view] = Region(rectF2Rect(outerRectF))
             else
-                mRegionMap.put(view, Region(rectF2Rect(innerRectF)))
+                mRegionMap[view] = Region(rectF2Rect(innerRectF))
     }
 
     //点击事件的处理
@@ -229,7 +227,7 @@ class NoviceGuideFloatingLayerView : View {
     private fun clickRegion(x: Int, y: Int) {
         if (!mRegionMap.isEmpty()) {
             val keys: MutableSet<View?>? = mRegionMap.keys
-            if (keys != null && !keys.isEmpty()) {
+            if (keys != null && keys.isNotEmpty()) {
                 val iterator = mRegionMap.keys.iterator()
                 var isClick = false
                 try {

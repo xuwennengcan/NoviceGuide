@@ -43,7 +43,7 @@ class NoviceGuideManager private constructor() {
         val frameLayout = NoviceGuideFloatingLayerView(activity, map, onClickListener)
         frameLayout.layoutParams = layoutParams
         viewGroup.addView(frameLayout)
-        frameLayoutMaps.put(activity, frameLayout)
+        frameLayoutMaps[activity] = frameLayout
         return frameLayout
     }
 

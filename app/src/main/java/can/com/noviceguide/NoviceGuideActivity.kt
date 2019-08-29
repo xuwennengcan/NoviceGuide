@@ -32,7 +32,7 @@ class NoviceGuideActivity : AppCompatActivity() {
         tv.setOnClickListener {
             isShow = !isShow
             if (isShow) {
-                map.put(tv, bean1)
+                map[tv] = bean1
                 NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){ _,_->
                     NoviceGuideManager.get().removeFloatingViewIfExit(this@NoviceGuideActivity)
                     isShow = false
@@ -43,7 +43,7 @@ class NoviceGuideActivity : AppCompatActivity() {
         val bean5 = NoviceGuideInfoBean(R.drawable.ic_guide_arrow,NoviceGuidePictureLocationType.BOTTOM,NoviceGuideViewShapeType.CIRCLE,false)
 
         ivMore.setOnClickListener {
-            map.put(ivMore,bean5)
+            map[ivMore] = bean5
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity,map)
                     ?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)
         }
@@ -51,7 +51,7 @@ class NoviceGuideActivity : AppCompatActivity() {
         tv2.setOnClickListener {
             isShow = !isShow
             if (isShow) {
-                map.put(tv2, bean2)
+                map[tv2] = bean2
                 NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){_,_->
                     NoviceGuideManager.get().removeFloatingViewIfExit(this@NoviceGuideActivity)
                     isShow = false
@@ -60,7 +60,7 @@ class NoviceGuideActivity : AppCompatActivity() {
         }
 
         tv3.setOnClickListener {
-            map.put(tv3, bean3)
+            map[tv3] = bean3
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)?.setOnSkipClickListener {
                 Toast.makeText(this@NoviceGuideActivity,"点击了跳过",Toast.LENGTH_SHORT).show()
             }?.setOnSkipText("跳过指引",NoviceGuideSkipTextPosition.LEFT_TOP)?.setOnIsTouchEmptyRegion(false)
@@ -69,7 +69,7 @@ class NoviceGuideActivity : AppCompatActivity() {
         tv4.setOnClickListener {
             isShow = !isShow
             if(isShow){
-                map.put(tv4,bean4)
+                map[tv4] = bean4
                 NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)
             }else{
                 //Toast.makeText(this@NoviceGuideActivity,"这是view的点击事件",Toast.LENGTH_SHORT).show()
@@ -79,10 +79,10 @@ class NoviceGuideActivity : AppCompatActivity() {
         tv5.setOnClickListener {
             isShow = !isShow
             if(isShow){
-                map.put(tv, bean1)
-                map.put(tv2, bean2)
-                map.put(tv3, bean3)
-                map.put(tv4,bean4)
+                map[tv] = bean1
+                map[tv2] = bean2
+                map[tv3] = bean3
+                map[tv4] = bean4
                 NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map)
             }
         }
