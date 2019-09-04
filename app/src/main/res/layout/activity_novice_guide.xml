@@ -26,28 +26,21 @@
         android:layout_marginLeft="30dp"
          />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/tv2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="150dp">
+        android:text="从下面弹出Bottom"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="20dp"/>
 
-        <Button
-            android:id="@+id/tv2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="从下面弹出Bottom"
-            android:layout_marginLeft="20dp"/>
-
-        <Button
-            android:id="@+id/tv3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="从上面弹出Top"
-            android:layout_marginLeft="20dp"
-            />
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/tv3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="上"
+        android:layout_gravity="right"
+        />
 
     <Button
         android:id="@+id/tv4"

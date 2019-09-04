@@ -200,12 +200,14 @@ class NoviceGuideFloatingLayerView : View {
                             (outerRectF.top + outerRectF.bottom - bitmap.height) / 2, Paint())
                 }
                 NoviceGuidePictureLocationType.TOP -> {
-                    canvas.drawBitmap(bitmap, ((width - bitmap.width) / 2).toFloat(),
-                            outerRectF.top - bitmap.height - mViewBitmapPadding, Paint())
+                    val left = if (outerRectF.left < width / 2) outerRectF.left + (outerRectF.right - outerRectF.left) / 2
+                    else outerRectF.left - bitmap.width + (outerRectF.right - outerRectF.left) / 2
+                    canvas.drawBitmap(bitmap, left, outerRectF.top - bitmap.height - mViewBitmapPadding, Paint())
                 }
                 NoviceGuidePictureLocationType.BOTTOM -> {
-                    canvas.drawBitmap(bitmap, ((width - bitmap.width) / 2).toFloat(),
-                            outerRectF.bottom + mViewBitmapPadding, Paint())
+                    val left = if (outerRectF.left < width / 2) outerRectF.left + (outerRectF.right - outerRectF.left) / 2
+                    else outerRectF.left - bitmap.width + (outerRectF.right - outerRectF.left) / 2
+                    canvas.drawBitmap(bitmap, left, outerRectF.bottom + mViewBitmapPadding, Paint())
                 }
             }
             bitmap.recycle()
