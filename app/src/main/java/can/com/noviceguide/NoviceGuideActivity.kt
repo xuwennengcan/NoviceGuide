@@ -41,11 +41,12 @@ class NoviceGuideActivity : AppCompatActivity() {
         }
 
         val bean5 = NoviceGuideInfoBean(R.drawable.ic_guide_arrow, NoviceGuidePictureLocationType.BOTTOM, NoviceGuideViewShapeType.CIRCLE, false
-                , R.drawable.ic_guide_share)
+                , R.drawable.ic_guide_share , -10)
 
         ivMore.setOnClickListener {
             map[ivMore] = bean5
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){_,_->
+                NoviceGuideManager.get().removeFloatingViewIfExit(this@NoviceGuideActivity)
 
             }
         }

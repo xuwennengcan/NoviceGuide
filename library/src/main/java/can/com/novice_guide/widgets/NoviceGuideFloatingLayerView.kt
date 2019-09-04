@@ -170,8 +170,9 @@ class NoviceGuideFloatingLayerView : View {
         val viewResource = bean.viewResource
         if (viewResource != null) {
             val viewBitmap = BitmapFactory.decodeResource(resources, viewResource)
-            canvas.drawBitmap(viewBitmap, getRect(0, 0, viewBitmap.width, viewBitmap.height, 0)
-                    , rectF2Rect(innerRectF), Paint())
+            canvas.drawBitmap(viewBitmap, getRect(0, 0, viewBitmap.width, viewBitmap.height, 0),
+                    getRect(innerRectF.left.toInt(), innerRectF.top.toInt(), innerRectF.right.toInt(), innerRectF.bottom.toInt(), bean.viewResourcePadding),
+                    Paint())
         } else if (bean.viewShapeType == NoviceGuideViewShapeType.CIRCLE) {//绘制圆
             canvas.drawCircle((innerRectF.right - innerRectF.left) / 2 + innerRectF.left,
                     (innerRectF.bottom - innerRectF.top) / 2 + innerRectF.top,
