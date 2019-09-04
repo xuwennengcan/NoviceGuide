@@ -166,7 +166,13 @@ class NoviceGuideFloatingLayerView : View {
         val innerRectF = highlightView.getRectF() //高亮view的位置信息(内圈)
         val outerRectF = RectF(innerRectF.left - mInnerOuterPadding, innerRectF.top - mInnerOuterPadding,
                 innerRectF.right + mInnerOuterPadding, innerRectF.bottom + mInnerOuterPadding)//高亮view的位置信息(外圈)
-        if (bean.viewShapeType == NoviceGuideViewShapeType.CIRCLE) {//绘制圆
+
+        val viewResource = bean.viewResource
+        if (viewResource != null) {
+            val viewBitmap = BitmapFactory.decodeResource(resources, viewResource)
+            canvas.drawBitmap(viewBitmap, getRect(0, 0, viewBitmap.width, viewBitmap.height, 0)
+                    , rectF2Rect(innerRectF), Paint())
+        } else if (bean.viewShapeType == NoviceGuideViewShapeType.CIRCLE) {//绘制圆
             canvas.drawCircle((innerRectF.right - innerRectF.left) / 2 + innerRectF.left,
                     (innerRectF.bottom - innerRectF.top) / 2 + innerRectF.top,
                     Math.max(innerRectF.width() / 2, innerRectF.height() / 2), mInnerPaint)
@@ -206,10 +212,11 @@ class NoviceGuideFloatingLayerView : View {
 
         //点击区域收集
         if (!mRegionMap.containsKey(view))
-            if (bean.needDrawOuter)
-                mRegionMap[view] = Region(rectF2Rect(outerRectF))
-            else
-                mRegionMap[view] = Region(rectF2Rect(innerRectF))
+            when {
+                viewResource != null -> mRegionMap[view] = Region(rectF2Rect(innerRectF))
+                bean.needDrawOuter -> mRegionMap[view] = Region(rectF2Rect(outerRectF))
+                else -> mRegionMap[view] = Region(rectF2Rect(innerRectF))
+            }
     }
 
     //点击事件的处理
