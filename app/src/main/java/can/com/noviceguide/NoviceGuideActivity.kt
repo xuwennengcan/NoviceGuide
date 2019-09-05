@@ -48,7 +48,7 @@ class NoviceGuideActivity : AppCompatActivity() {
             NoviceGuideManager.get().addNoviceGuide(this@NoviceGuideActivity, map){_,_->
                 NoviceGuideManager.get().removeFloatingViewIfExit(this@NoviceGuideActivity)
 
-            }
+            }?.setSkipTextVisiable(View.GONE)
         }
 
         tv2.setOnClickListener {

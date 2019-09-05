@@ -42,6 +42,7 @@ class NoviceGuideFloatingLayerView : View {
 
     private var mSkipText = "跳过" //文字
     private var mSkipTextPosition = NoviceGuideSkipTextPosition.RIGHT_TOP //跳过文字的位置
+    private var mSkipTextVisibility = VISIBLE //是否显示
 
     private val mInnerOuterPadding = 10//外圈与内圈的距离
     private val mHighLightRectPadding = 10//高亮view与原始view的间距
@@ -81,6 +82,11 @@ class NoviceGuideFloatingLayerView : View {
         mSkipText = skip
         mSkipTextPosition = skipPosition
         return this
+    }
+
+    //设置是否显示跳过按钮
+    fun setSkipTextVisiable(visibility: Int) {
+        mSkipTextVisibility = visibility
     }
 
     //设置点击其它空白区域是否响应跳过事件(默认true)
@@ -124,7 +130,8 @@ class NoviceGuideFloatingLayerView : View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        drawText(canvas, mSkipText)
+        if (mSkipTextVisibility == VISIBLE)
+            drawText(canvas, mSkipText)
 
         val keys: MutableSet<View?>? = mMap?.keys
 
