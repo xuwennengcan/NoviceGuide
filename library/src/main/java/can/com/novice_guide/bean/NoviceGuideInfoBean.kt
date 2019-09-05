@@ -9,4 +9,5 @@ class NoviceGuideInfoBean(val bitmapResource: Int,
                           val viewShapeType: Int,
                           val needDrawOuter: Boolean = true,
                           val viewResource: Int? = null,
-                          val viewResourcePadding: Int = 0)
+                          val viewResourcePadding: Int = 0,
+                          val highLightRectPadding: Int? = null)

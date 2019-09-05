@@ -45,7 +45,7 @@ class NoviceGuideFloatingLayerView : View {
     private var mSkipTextVisibility = VISIBLE //是否显示
 
     private val mInnerOuterPadding = 10//外圈与内圈的距离
-    private val mHighLightRectPadding = 10//高亮view与原始view的间距
+    private var mHighLightRectPadding = 10//高亮view与原始view的间距
     private val mViewBitmapPadding = 20 //高亮view和图片间距
 
     constructor(context: Context) : super(context)
@@ -169,6 +169,8 @@ class NoviceGuideFloatingLayerView : View {
             return
 
         //绘制高亮view
+        if (bean.highLightRectPadding != null)
+            mHighLightRectPadding = bean.highLightRectPadding
         val highlightView = NoviceGuideHighlightView(view, mHighLightRectPadding) //高亮view
         val innerRectF = highlightView.getRectF() //高亮view的位置信息(内圈)
         val outerRectF = RectF(innerRectF.left - mInnerOuterPadding, innerRectF.top - mInnerOuterPadding,
