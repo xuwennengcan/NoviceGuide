@@ -85,8 +85,9 @@ class NoviceGuideFloatingLayerView : View {
     }
 
     //设置是否显示跳过按钮
-    fun setSkipTextVisiable(visibility: Int) {
+    fun setSkipTextVisibility(visibility: Int): NoviceGuideFloatingLayerView? {
         mSkipTextVisibility = visibility
+        return this
     }
 
     //设置点击其它空白区域是否响应跳过事件(默认true)
@@ -209,13 +210,19 @@ class NoviceGuideFloatingLayerView : View {
                             (outerRectF.top + outerRectF.bottom - bitmap.height) / 2, Paint())
                 }
                 NoviceGuidePictureLocationType.TOP -> {
-                    val left = if (outerRectF.left < width / 2) outerRectF.left + (outerRectF.right - outerRectF.left) / 2
-                    else outerRectF.left - bitmap.width + (outerRectF.right - outerRectF.left) / 2
+                    val left = when {
+                        bean.bitmapIsCenter -> ((width - bitmap.width) / 2).toFloat()
+                        outerRectF.left < width / 2 -> outerRectF.left + (outerRectF.right - outerRectF.left) / 2
+                        else -> outerRectF.left - bitmap.width + (outerRectF.right - outerRectF.left) / 2
+                    }
                     canvas.drawBitmap(bitmap, left, outerRectF.top - bitmap.height - mViewBitmapPadding, Paint())
                 }
                 NoviceGuidePictureLocationType.BOTTOM -> {
-                    val left = if (outerRectF.left < width / 2) outerRectF.left + (outerRectF.right - outerRectF.left) / 2
-                    else outerRectF.left - bitmap.width + (outerRectF.right - outerRectF.left) / 2
+                    val left = when {
+                        bean.bitmapIsCenter -> ((width - bitmap.width) / 2).toFloat()
+                        outerRectF.left < width / 2 -> outerRectF.left + (outerRectF.right - outerRectF.left) / 2
+                        else -> outerRectF.left - bitmap.width + (outerRectF.right - outerRectF.left) / 2
+                    }
                     canvas.drawBitmap(bitmap, left, outerRectF.bottom + mViewBitmapPadding, Paint())
                 }
             }
